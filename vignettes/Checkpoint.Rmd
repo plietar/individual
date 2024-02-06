@@ -313,20 +313,16 @@ all.equal(uninterrupted_run, piecewise_run)
 Using `restore_random_state = TRUE` resets the global random number generator's state, which could have surprising and undesirable side effects. It is generally useful in tests, but should be used carefully elsewhere.
 
 ```{r}
-set.seed(123)
-print(.GlobalEnv$.Random.seed)
-set.seed(123)
-print(run_simulation(steps=10)$state$variables)
-set.seed(123)
-print(run_simulation(steps=15)$state$variables)
-set.seed(123)
-print(run_simulation(steps=20)$state$variables)
-set.seed(123)
-print(run_simulation(steps=25)$state$variables)
-set.seed(123)
-print(run_simulation(steps=50)$state$variables)
-set.seed(123)
-print(run_simulation(steps=100)$state$variables)
-set.seed(123)
-print(runif(5))
+for (i in 1:50) {
+  set.seed(123)
+  x <- run_simulation(steps=i)$state$variables
+  set.seed(123)
+  y <- run_simulation(steps=i)$state$variables
+  if (!isTRUE(all.equal(x, y))) {
+    print(i)
+    print(x)
+    print(y)
+    break
+  }
+}
 ```
