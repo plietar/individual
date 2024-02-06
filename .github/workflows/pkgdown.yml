@@ -42,13 +42,6 @@ jobs:
           install.packages("pkgdown", type = "binary")
         shell: Rscript {0}
 
-      - name: Install package
-        run: R CMD INSTALL .
-
-      - name: Build site
-        run: |
-          Rscript -e 'pkgdown::build_site()'
-
       - name: Deploy package
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |

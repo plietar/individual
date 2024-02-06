@@ -106,11 +106,14 @@ For a while at the start of the simulation no vaccination takes place. Only afte
 make_vaccination_event <- function(vaccinated, vaccination_start, vaccination_interval, vaccination_rate) {
   e <- Event$new()
   e$add_listener(function(t) {
+    print("Vaccine time")
+    print(t)
     vaccinated$queue_update(value = "Y",
       vaccinated$get_index_of("N")$sample(vaccination_rate))
     e$schedule(vaccination_interval)
   })
   if (!is.null(vaccination_start)) {
+    print("Scheduling vaccination")
     e$schedule(vaccination_start - 1)
   }
   e
