@@ -315,6 +315,7 @@ Using `restore_random_state = TRUE` resets the global random number generator's 
 ```{r}
 for (i in 1:50) {
   set.seed(123)
+  set.seed(123)
   x <- run_simulation(steps=i)$state$variables
   set.seed(123)
   y <- run_simulation(steps=i)$state$variables
