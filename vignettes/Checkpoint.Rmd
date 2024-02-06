@@ -315,5 +315,12 @@ Using `restore_random_state = TRUE` resets the global random number generator's 
 ```{r}
 set.seed(123)
 print(.GlobalEnv$.Random.seed)
+set.seed(123)
+print(run_simulation(steps=1))
+set.seed(123)
+print(run_simulation(steps=10))
+set.seed(123)
+print(run_simulation(steps=100))
+set.seed(123)
 print(runif(5))
 ```
