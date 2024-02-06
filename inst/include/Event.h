@@ -93,8 +93,9 @@ inline void Event::process(Rcpp::XPtr<listener_t> listener) {
 //' @title should first event fire on this timestep?
 inline bool Event::should_trigger() {
     if (targeted_schedule.empty()) {
-        return *simple_schedule.begin() == get_time();
+        return false;
     }
+    return *simple_schedule.begin() == get_time();
 }
 
 //' @title delete current time step from simple_schedule and increase time step
