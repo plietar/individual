@@ -1,0 +1,12 @@
+pandoc: 2.19.2
+pkgdown: 2.0.7
+pkgdown_sha: ~
+articles:
+  API: API.html
+  Changing_Populations: Changing_Populations.html
+  Checkpoint: Checkpoint.html
+  Contributing: Contributing.html
+  Performance: Performance.html
+  Tutorial: Tutorial.html
+last_built: 2024-02-06T13:56Z
+
