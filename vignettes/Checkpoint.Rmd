@@ -311,3 +311,9 @@ all.equal(uninterrupted_run, piecewise_run)
 ```
 
 Using `restore_random_state = TRUE` resets the global random number generator's state, which could have surprising and undesirable side effects. It is generally useful in tests, but should be used carefully elsewhere.
+
+```{r}
+set.seed(123)
+print(.GlobalEnv$.Random.seed)
+print(runif(5))
+```
