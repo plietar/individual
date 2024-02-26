@@ -118,6 +118,70 @@ void bitset_sample(
 }
 
 //[[Rcpp::export]]
+void bitset_sample_binomial(
+    const Rcpp::XPtr<individual_index_t> b,
+    double rate
+    ) {
+    bitset_sample_internal_binomial(*b.get(), rate);
+}
+
+//[[Rcpp::export]]
+void bitset_sample_binomial_opt(
+    const Rcpp::XPtr<individual_index_t> b,
+    double rate
+    ) {
+    bitset_sample_internal_binomial_opt(*b.get(), rate);
+}
+
+//[[Rcpp::export]]
+void bitset_sample_binomial_opt_faster(
+    const Rcpp::XPtr<individual_index_t> b,
+    double rate
+    ) {
+    bitset_sample_internal_binomial_opt_faster(*b.get(), rate);
+}
+
+//[[Rcpp::export]]
+void bitset_sample_binomial_opt_faster_bmi2(
+    const Rcpp::XPtr<individual_index_t> b,
+    double rate
+    ) {
+    bitset_sample_internal_binomial_opt_faster_bmi2(*b.get(), rate);
+}
+
+//[[Rcpp::export]]
+void bitset_sample_skip(
+    const Rcpp::XPtr<individual_index_t> b,
+    double rate
+    ) {
+    bitset_sample_internal_skip(*b.get(), rate);
+}
+
+//[[Rcpp::export]]
+void bitset_sample_skip_faster_bmi2(
+    const Rcpp::XPtr<individual_index_t> b,
+    double rate
+    ) {
+    bitset_sample_internal_skip_faster_bmi2(*b.get(), rate);
+}
+
+//[[Rcpp::export]]
+void bitset_sample_naive(
+    const Rcpp::XPtr<individual_index_t> b,
+    double rate
+    ) {
+    bitset_sample_internal_naive(*b.get(), rate);
+}
+
+//[[Rcpp::export]]
+void bitset_sample_naive_bulk(
+    const Rcpp::XPtr<individual_index_t> b,
+    double rate
+    ) {
+    bitset_sample_internal_naive_bulk(*b.get(), rate);
+}
+
+//[[Rcpp::export]]
 void bitset_sample_vector(
     const Rcpp::XPtr<individual_index_t> b,
     const std::vector<double> rate

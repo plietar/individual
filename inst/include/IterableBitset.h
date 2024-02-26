@@ -10,6 +10,7 @@
 
 #include <cmath>
 #include <Rcpp.h>
+#include <immintrin.h>
 #include "utils.h"
 
 template<class A>
@@ -101,6 +102,7 @@ public:
     void extend(size_t);
     void shrink(const std::vector<size_t>&);
     size_t next_position(size_t start, size_t n) const;
+    size_t next_position_bmi2(size_t start, size_t n) const;
 };
 
 
@@ -141,11 +143,19 @@ inline size_t find_bit(uint64_t x, size_t n) {
     if (n >= 64) {
         return 64;
     }
+    //return _tzcnt_u64(_pdep_u64(1ULL << n, x));
 
     for (size_t i = 0; i < n; i++) {
         x &= x - 1;
     }
     return ctz(x);
+}
+
+inline size_t find_bit_bmi2(uint64_t x, size_t n) {
+    if (n >= 64) {
+        return 64;
+    }
+    return _tzcnt_u64(_pdep_u64(1ULL << n, x));
 }
 
 //' Find the n-th set bit, starting at position p.
@@ -165,6 +175,23 @@ inline size_t IterableBitset<A>::next_position(size_t p, size_t n) const {
     }
 
     auto r = find_bit(bitset, n);
+    return std::min(bucket * num_bits + excess + r, max_n);
+}
+
+template<class A>
+inline size_t IterableBitset<A>::next_position_bmi2(size_t p, size_t n) const {
+    size_t bucket = p / num_bits;
+    size_t excess = p % num_bits;
+
+    A bitset = bitmap[bucket] >> excess;
+    while (n >= popcount(bitset) && bucket + 1 < bitmap.size()) {
+        n -= popcount(bitset);
+        bucket += 1;
+        bitset = bitmap[bucket];
+        excess = 0;
+    }
+
+    auto r = find_bit_bmi2(bitset, n);
     return std::min(bucket * num_bits + excess + r, max_n);
 }
 
@@ -672,6 +699,261 @@ inline void bitset_sample_internal(
         }
     }
 }
+
+template<class A>
+inline void bitset_sample_internal_skip_faster_bmi2(
+    IterableBitset<A>& b,
+    const double rate
+){
+    if (rate < 0.5) {
+        fast_bernouilli bernouilli(rate);
+        size_t i = 0;
+        while (i < b.max_size()) {
+            size_t next = b.next_position_bmi2(i, bernouilli.skip_count());
+            b.erase(i, next);
+            i = next + 1;
+        }
+    } else {
+        fast_bernouilli bernouilli(1 - rate);
+        size_t i = 0;
+        while (i < b.max_size()) {
+            size_t next = b.next_position_bmi2(i, bernouilli.skip_count());
+            if (next < b.max_size()) {
+                b.erase(next);
+            }
+            i = next + 1;
+        }
+    }
+}
+
+template<class A>
+inline void bitset_sample_internal_binomial(
+    IterableBitset<A>& b,
+    const double rate
+){
+    auto to_remove = Rcpp::sample(
+        b.size(),
+        R::rbinom(b.size(), 1 - std::min(rate, 1.)),
+        false, // replacement
+        R_NilValue, // evenly distributed
+        false // one based
+    );
+    std::sort(to_remove.begin(), to_remove.end());
+    auto bitset_i = 0;
+    auto bitset_it = b.cbegin();
+    for (auto i : to_remove) {
+      while(bitset_i != i) {
+        ++bitset_i;
+        ++bitset_it;
+      }
+      b.erase(*bitset_it);
+      ++bitset_i;
+      ++bitset_it;
+    }
+}
+
+template<class A>
+inline void bitset_sample_internal_binomial_opt(
+    IterableBitset<A>& b,
+    const double rate
+) {
+    if (rate < 0.5) {
+        auto to_keep = Rcpp::sample(
+                b.size(),
+                R::rbinom(b.size(), rate),
+                false, // replacement
+                R_NilValue, // evenly distributed
+                false // one based
+                );
+        std::sort(to_keep.begin(), to_keep.end());
+
+        auto bitset_i = 0;
+        auto bitset_it = b.cbegin();
+        for (auto i : to_keep) {
+            while(bitset_i != i) {
+                b.erase(*bitset_it);
+                ++bitset_i;
+                ++bitset_it;
+            }
+            ++bitset_i;
+            ++bitset_it;
+        }
+        for (; bitset_it != b.cend(); ++bitset_it) {
+            b.erase(*bitset_it);
+        }
+    } else {
+        auto to_remove = Rcpp::sample(
+                b.size(),
+                R::rbinom(b.size(), 1 - std::min(rate, 1.)),
+                false, // replacement
+                R_NilValue, // evenly distributed
+                false // one based
+                );
+        std::sort(to_remove.begin(), to_remove.end());
+        auto bitset_i = 0;
+        auto bitset_it = b.cbegin();
+        for (auto i : to_remove) {
+            while(bitset_i != i) {
+                ++bitset_i;
+                ++bitset_it;
+            }
+            b.erase(*bitset_it);
+            ++bitset_i;
+            ++bitset_it;
+        }
+    }
+}
+
+template<class A>
+inline void bitset_sample_internal_binomial_opt_faster(
+    IterableBitset<A>& b,
+    const double rate
+) {
+    if (rate < 0.5) {
+        auto to_keep = Rcpp::sample(
+                b.size(),
+                R::rbinom(b.size(), rate),
+                false, // replacement
+                R_NilValue, // evenly distributed
+                false // one based
+                );
+        std::sort(to_keep.begin(), to_keep.end());
+
+        size_t i = 0;
+        size_t p = 0;
+        for (auto k: to_keep) {
+            size_t skip_count = k - p;
+            size_t next = b.next_position(i, skip_count);
+            b.erase(i, next);
+            p = k + 1;
+            i = next + 1;
+        }
+        b.erase(i, b.max_size());
+    } else {
+        auto to_remove = Rcpp::sample(
+                b.size(),
+                R::rbinom(b.size(), 1 - std::min(rate, 1.)),
+                false, // replacement
+                R_NilValue, // evenly distributed
+                false // one based
+                );
+        std::sort(to_remove.begin(), to_remove.end());
+
+        size_t i = 0;
+        size_t p = 0;
+        for (auto r: to_remove) {
+            size_t skip_count = r - p;
+            size_t next = b.next_position(i, skip_count);
+            b.erase(next);
+            p = r + 1;
+            i = next + 1;
+        }
+    }
+}
+
+template<class A>
+inline void bitset_sample_internal_binomial_opt_faster_bmi2(
+    IterableBitset<A>& b,
+    const double rate
+) {
+    if (rate < 0.5) {
+        auto to_keep = Rcpp::sample(
+                b.size(),
+                R::rbinom(b.size(), rate),
+                false, // replacement
+                R_NilValue, // evenly distributed
+                false // one based
+                );
+        std::sort(to_keep.begin(), to_keep.end());
+
+        size_t i = 0;
+        size_t p = 0;
+        for (auto k: to_keep) {
+            size_t skip_count = k - p;
+            size_t next = b.next_position_bmi2(i, skip_count);
+            b.erase(i, next);
+            p = k + 1;
+            i = next + 1;
+        }
+        b.erase(i, b.max_size());
+    } else {
+        auto to_remove = Rcpp::sample(
+                b.size(),
+                R::rbinom(b.size(), 1 - std::min(rate, 1.)),
+                false, // replacement
+                R_NilValue, // evenly distributed
+                false // one based
+                );
+        std::sort(to_remove.begin(), to_remove.end());
+
+        size_t i = 0;
+        size_t p = 0;
+        for (auto r: to_remove) {
+            size_t skip_count = r - p;
+            size_t next = b.next_position_bmi2(i, skip_count);
+            b.erase(next);
+            p = r + 1;
+            i = next + 1;
+        }
+    }
+}
+
+template<class A>
+inline void bitset_sample_internal_skip(
+    IterableBitset<A>& b,
+    const double rate
+){
+    if (rate < 0.5) {
+        fast_bernouilli bernouilli(rate);
+        size_t skip_count = bernouilli.skip_count();
+        for (auto it = b.begin(); it != b.end(); ++it) {
+            if (skip_count == 0) {
+                b.erase(*it);
+                skip_count = bernouilli.skip_count();
+            } else {
+                skip_count -= 1;
+            }
+        }
+    } else {
+        fast_bernouilli bernouilli(1 - rate);
+        size_t skip_count = bernouilli.skip_count();
+        for (auto it = b.begin(); it != b.end(); ++it) {
+            if (skip_count == 0) {
+                skip_count = bernouilli.skip_count();
+            } else {
+                skip_count -= 1;
+                b.erase(*it);
+            }
+        }
+    }
+}
+
+template<class A>
+inline void bitset_sample_internal_naive(
+    IterableBitset<A>& b,
+    const double rate
+){
+    for (auto it = b.begin(); it != b.end(); ++it) {
+        if (R::runif(0.0, 1.0) > rate) {
+            b.erase(*it);
+        }
+    }
+}
+
+template<class A>
+inline void bitset_sample_internal_naive_bulk(
+    IterableBitset<A>& b,
+    const double rate
+){
+    auto values = Rcpp::runif(b.size(), 0.0, 1.0);
+    auto values_it = values.begin();
+    for (auto it = b.begin(); it != b.end(); ++it, ++values_it) {
+        if (*values_it > rate) {
+            b.erase(*it);
+        }
+    }
+}
+
 
 //' @title sample the bitset
 //' @description retain a subset of values contained in this bitset, 

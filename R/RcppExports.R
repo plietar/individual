@@ -57,6 +57,38 @@ bitset_sample <- function(b, rate) {
     invisible(.Call(`_individual_bitset_sample`, b, rate))
 }
 
+bitset_sample_binomial <- function(b, rate) {
+    invisible(.Call(`_individual_bitset_sample_binomial`, b, rate))
+}
+
+bitset_sample_binomial_opt <- function(b, rate) {
+    invisible(.Call(`_individual_bitset_sample_binomial_opt`, b, rate))
+}
+
+bitset_sample_binomial_opt_faster <- function(b, rate) {
+    invisible(.Call(`_individual_bitset_sample_binomial_opt_faster`, b, rate))
+}
+
+bitset_sample_binomial_opt_faster_bmi2 <- function(b, rate) {
+    invisible(.Call(`_individual_bitset_sample_binomial_opt_faster_bmi2`, b, rate))
+}
+
+bitset_sample_skip <- function(b, rate) {
+    invisible(.Call(`_individual_bitset_sample_skip`, b, rate))
+}
+
+bitset_sample_skip_faster_bmi2 <- function(b, rate) {
+    invisible(.Call(`_individual_bitset_sample_skip_faster_bmi2`, b, rate))
+}
+
+bitset_sample_naive <- function(b, rate) {
+    invisible(.Call(`_individual_bitset_sample_naive`, b, rate))
+}
+
+bitset_sample_naive_bulk <- function(b, rate) {
+    invisible(.Call(`_individual_bitset_sample_naive_bulk`, b, rate))
+}
+
 bitset_sample_vector <- function(b, rate) {
     invisible(.Call(`_individual_bitset_sample_vector`, b, rate))
 }

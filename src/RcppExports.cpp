@@ -167,6 +167,94 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// bitset_sample_binomial
+void bitset_sample_binomial(const Rcpp::XPtr<individual_index_t> b, double rate);
+RcppExport SEXP _individual_bitset_sample_binomial(SEXP bSEXP, SEXP rateSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::XPtr<individual_index_t> >::type b(bSEXP);
+    Rcpp::traits::input_parameter< double >::type rate(rateSEXP);
+    bitset_sample_binomial(b, rate);
+    return R_NilValue;
+END_RCPP
+}
+// bitset_sample_binomial_opt
+void bitset_sample_binomial_opt(const Rcpp::XPtr<individual_index_t> b, double rate);
+RcppExport SEXP _individual_bitset_sample_binomial_opt(SEXP bSEXP, SEXP rateSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::XPtr<individual_index_t> >::type b(bSEXP);
+    Rcpp::traits::input_parameter< double >::type rate(rateSEXP);
+    bitset_sample_binomial_opt(b, rate);
+    return R_NilValue;
+END_RCPP
+}
+// bitset_sample_binomial_opt_faster
+void bitset_sample_binomial_opt_faster(const Rcpp::XPtr<individual_index_t> b, double rate);
+RcppExport SEXP _individual_bitset_sample_binomial_opt_faster(SEXP bSEXP, SEXP rateSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::XPtr<individual_index_t> >::type b(bSEXP);
+    Rcpp::traits::input_parameter< double >::type rate(rateSEXP);
+    bitset_sample_binomial_opt_faster(b, rate);
+    return R_NilValue;
+END_RCPP
+}
+// bitset_sample_binomial_opt_faster_bmi2
+void bitset_sample_binomial_opt_faster_bmi2(const Rcpp::XPtr<individual_index_t> b, double rate);
+RcppExport SEXP _individual_bitset_sample_binomial_opt_faster_bmi2(SEXP bSEXP, SEXP rateSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::XPtr<individual_index_t> >::type b(bSEXP);
+    Rcpp::traits::input_parameter< double >::type rate(rateSEXP);
+    bitset_sample_binomial_opt_faster_bmi2(b, rate);
+    return R_NilValue;
+END_RCPP
+}
+// bitset_sample_skip
+void bitset_sample_skip(const Rcpp::XPtr<individual_index_t> b, double rate);
+RcppExport SEXP _individual_bitset_sample_skip(SEXP bSEXP, SEXP rateSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::XPtr<individual_index_t> >::type b(bSEXP);
+    Rcpp::traits::input_parameter< double >::type rate(rateSEXP);
+    bitset_sample_skip(b, rate);
+    return R_NilValue;
+END_RCPP
+}
+// bitset_sample_skip_faster_bmi2
+void bitset_sample_skip_faster_bmi2(const Rcpp::XPtr<individual_index_t> b, double rate);
+RcppExport SEXP _individual_bitset_sample_skip_faster_bmi2(SEXP bSEXP, SEXP rateSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::XPtr<individual_index_t> >::type b(bSEXP);
+    Rcpp::traits::input_parameter< double >::type rate(rateSEXP);
+    bitset_sample_skip_faster_bmi2(b, rate);
+    return R_NilValue;
+END_RCPP
+}
+// bitset_sample_naive
+void bitset_sample_naive(const Rcpp::XPtr<individual_index_t> b, double rate);
+RcppExport SEXP _individual_bitset_sample_naive(SEXP bSEXP, SEXP rateSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::XPtr<individual_index_t> >::type b(bSEXP);
+    Rcpp::traits::input_parameter< double >::type rate(rateSEXP);
+    bitset_sample_naive(b, rate);
+    return R_NilValue;
+END_RCPP
+}
+// bitset_sample_naive_bulk
+void bitset_sample_naive_bulk(const Rcpp::XPtr<individual_index_t> b, double rate);
+RcppExport SEXP _individual_bitset_sample_naive_bulk(SEXP bSEXP, SEXP rateSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::XPtr<individual_index_t> >::type b(bSEXP);
+    Rcpp::traits::input_parameter< double >::type rate(rateSEXP);
+    bitset_sample_naive_bulk(b, rate);
+    return R_NilValue;
+END_RCPP
+}
 // bitset_sample_vector
 void bitset_sample_vector(const Rcpp::XPtr<individual_index_t> b, const std::vector<double> rate);
 RcppExport SEXP _individual_bitset_sample_vector(SEXP bSEXP, SEXP rateSEXP) {
@@ -1470,6 +1558,14 @@ static const R_CallMethodDef CallEntries[] = {
     {"_individual_bitset_xor", (DL_FUNC) &_individual_bitset_xor, 2},
     {"_individual_bitset_set_difference", (DL_FUNC) &_individual_bitset_set_difference, 2},
     {"_individual_bitset_sample", (DL_FUNC) &_individual_bitset_sample, 2},
+    {"_individual_bitset_sample_binomial", (DL_FUNC) &_individual_bitset_sample_binomial, 2},
+    {"_individual_bitset_sample_binomial_opt", (DL_FUNC) &_individual_bitset_sample_binomial_opt, 2},
+    {"_individual_bitset_sample_binomial_opt_faster", (DL_FUNC) &_individual_bitset_sample_binomial_opt_faster, 2},
+    {"_individual_bitset_sample_binomial_opt_faster_bmi2", (DL_FUNC) &_individual_bitset_sample_binomial_opt_faster_bmi2, 2},
+    {"_individual_bitset_sample_skip", (DL_FUNC) &_individual_bitset_sample_skip, 2},
+    {"_individual_bitset_sample_skip_faster_bmi2", (DL_FUNC) &_individual_bitset_sample_skip_faster_bmi2, 2},
+    {"_individual_bitset_sample_naive", (DL_FUNC) &_individual_bitset_sample_naive, 2},
+    {"_individual_bitset_sample_naive_bulk", (DL_FUNC) &_individual_bitset_sample_naive_bulk, 2},
     {"_individual_bitset_sample_vector", (DL_FUNC) &_individual_bitset_sample_vector, 2},
     {"_individual_bitset_to_vector", (DL_FUNC) &_individual_bitset_to_vector, 1},
     {"_individual_filter_bitset_vector", (DL_FUNC) &_individual_filter_bitset_vector, 2},
