@@ -48,6 +48,11 @@ void bitset_clear(const Rcpp::XPtr<individual_index_t> b) {
 }
 
 //[[Rcpp::export]]
+void bitset_fill(const Rcpp::XPtr<individual_index_t> b) {
+    b->fill();
+}
+
+//[[Rcpp::export]]
 size_t bitset_size(const Rcpp::XPtr<individual_index_t> b) {
     return b->size();
 }

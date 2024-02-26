@@ -78,6 +78,7 @@ public:
     IterableBitset& operator|=(const IterableBitset&);
     IterableBitset& operator^=(const IterableBitset&);
     IterableBitset& clear();
+    IterableBitset& fill();
     IterableBitset& inverse();
     iterator begin();
     const_iterator begin() const;
@@ -204,7 +205,7 @@ inline typename IterableBitset<A>::const_iterator::reference IterableBitset<A>::
 template<class A>
 inline IterableBitset<A>::IterableBitset(size_t size) : max_n(size){
     num_bits = sizeof(A) * 8;
-    bitmap = std::vector<A>(size/num_bits + 1, 0);
+    bitmap = std::vector<A>((size + num_bits - 1)/num_bits, 0);
     n = 0;
 }
 
@@ -253,23 +254,39 @@ inline IterableBitset<A> IterableBitset<A>::operator ^(const IterableBitset<A>& 
 
 template<class A>
 inline IterableBitset<A>& IterableBitset<A>::clear() {
-  for (auto i = 0u; i < bitmap.size(); ++i) {
-    bitmap[i] = 0x0ULL;
-  }
-  n = 0;
-  return *this;
+    std::fill(bitmap.begin(), bitmap.end(), 0);
+    n = 0;
+    return *this;
+}
+
+template<class A>
+inline IterableBitset<A>& IterableBitset<A>::fill() {
+    std::fill(bitmap.begin(), bitmap.end(), ~static_cast<A>(0));
+
+    // mask out the values after max_n
+    if (max_n % num_bits != 0) {
+        A residual = (static_cast<A>(1) << (max_n % num_bits)) - 1;
+        bitmap.back() &= residual;
+    }
+
+    n = max_n;
+    return *this;
 }
 
 template<class A>
 inline IterableBitset<A>& IterableBitset<A>::inverse() {
-  for (auto i = 0u; i < bitmap.size(); ++i) {
-    bitmap[i] = ~bitmap[i];
-  }
-  //mask out the values after max_n
-  A residual = (static_cast<A>(1) << (max_n % num_bits)) - 1;
-  bitmap[bitmap.size() - 1] &= residual;
-  n = max_n - n;
-  return *this;
+    for (auto i = 0u; i < bitmap.size(); ++i) {
+        bitmap[i] = ~bitmap[i];
+    }
+
+    // mask out the values after max_n
+    if (max_n % num_bits != 0) {
+        A residual = (static_cast<A>(1) << (max_n % num_bits)) - 1;
+        bitmap.back() &= residual;
+    }
+
+    n = max_n - n;
+    return *this;
 }
 
 template<class A>

@@ -21,6 +21,10 @@ bitset_clear <- function(b) {
     invisible(.Call(`_individual_bitset_clear`, b))
 }
 
+bitset_fill <- function(b) {
+    invisible(.Call(`_individual_bitset_fill`, b))
+}
+
 bitset_size <- function(b) {
     .Call(`_individual_bitset_size`, b)
 }

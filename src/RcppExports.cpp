@@ -68,6 +68,16 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// bitset_fill
+void bitset_fill(const Rcpp::XPtr<individual_index_t> b);
+RcppExport SEXP _individual_bitset_fill(SEXP bSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::XPtr<individual_index_t> >::type b(bSEXP);
+    bitset_fill(b);
+    return R_NilValue;
+END_RCPP
+}
 // bitset_size
 size_t bitset_size(const Rcpp::XPtr<individual_index_t> b);
 RcppExport SEXP _individual_bitset_size(SEXP bSEXP) {
@@ -1451,6 +1461,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_individual_bitset_insert", (DL_FUNC) &_individual_bitset_insert, 2},
     {"_individual_bitset_remove", (DL_FUNC) &_individual_bitset_remove, 2},
     {"_individual_bitset_clear", (DL_FUNC) &_individual_bitset_clear, 1},
+    {"_individual_bitset_fill", (DL_FUNC) &_individual_bitset_fill, 1},
     {"_individual_bitset_size", (DL_FUNC) &_individual_bitset_size, 1},
     {"_individual_bitset_max_size", (DL_FUNC) &_individual_bitset_max_size, 1},
     {"_individual_bitset_and", (DL_FUNC) &_individual_bitset_and, 2},

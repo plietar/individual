@@ -50,6 +50,12 @@ Bitset <- R6Class(
       self
     },
 
+    #' @description fill the bitset.
+    fill = function() {
+      bitset_fill(self$.bitset)
+      self
+    },
+
     #' @description get the number of elements in the set.
     size = function() bitset_size(self$.bitset),
 
