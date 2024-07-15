@@ -58,6 +58,7 @@ public:
         bool operator!=(const const_iterator&) const;
 
         const_iterator& operator++();
+        const_iterator& operator+=(size_t n);
 
         reference operator*();
     };
@@ -193,6 +194,12 @@ inline bool IterableBitset<A>::const_iterator::operator !=(
 template<class A>
 inline typename IterableBitset<A>::const_iterator& IterableBitset<A>::const_iterator::operator ++() {
     p = index.next_position(p + 1, 0);
+    return *this;
+}
+
+template<class A>
+inline typename IterableBitset<A>::const_iterator& IterableBitset<A>::const_iterator::operator +=(size_t n) {
+    p = index.next_position(p, n);
     return *this;
 }
 
